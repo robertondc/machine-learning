@@ -27,6 +27,3 @@ taxa_de_acerto = 100 * total_de_acertos / total_de_elementos
 print("%s%%" % (taxa_de_acerto))
 print(total_de_elementos)
 
-
-
-

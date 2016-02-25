@@ -14,4 +14,4 @@ def carregar_acessos():
 		X.append(dado)
 		Y.append(int(comprou))
 
-	return X, Y 
+	return X, Y
