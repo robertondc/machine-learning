@@ -1,6 +1,7 @@
+from collections import Counter
 import pandas as pd
 
-df = pd.read_csv('busca.csv')
+df = pd.read_csv('busca2.csv')
 
 X_df = df[['home', 'busca', 'logado']]
 Y_df = df['comprou']
@@ -27,14 +28,19 @@ modelo = MultinomialNB()
 modelo.fit(treino_dados,treino_marcacoes)
 
 resultado = modelo.predict(teste_dados)
-diferencas = resultado - teste_marcacoes
+acertos = (resultado == teste_marcacoes)
 
-acertos = [d for d in diferencas if d == 0]
-total_de_acertos = len(acertos)
+total_de_acertos = sum(acertos) #true e false somam como 0 e 1
 total_de_elementos = len(teste_dados)
-total_de_acerto = total_de_elementos - total_de_acertos
 taxa_de_acerto = 100.0 * total_de_acertos / total_de_elementos
 
 print(taxa_de_acerto)
 print(total_de_elementos)
+
+#eficacia do algoritimo via chute
+
+acerto_base = max(Counter(teste_marcacoes).itervalues())
+taxa_de_acerto_base = 100.0 * acerto_base / total_de_elementos
+print("Taxa de acerto base: %f" % taxa_de_acerto_base)
+print("Total de testes: %d" % len(teste_dados))
 
