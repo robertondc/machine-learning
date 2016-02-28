@@ -1,7 +1,7 @@
 from collections import Counter
 import pandas as pd
 
-df = pd.read_csv('busca2.csv')
+df = pd.read_csv('busca.csv')
 
 X_df = df[['home', 'busca', 'logado']]
 Y_df = df['comprou']
@@ -12,28 +12,37 @@ Ydummies_df = Y_df
 X = Xdummies_df.values
 Y = Ydummies_df.values
 
-porcentagem_de_treino = 0.9
+porcentagem_de_treino = 0.8
+porcetagem_de_teste = 0.1
 
 tamanho_de_treino = porcentagem_de_treino * len(Y)
-tamanho_de_teste = len(Y) - tamanho_de_treino
+tamanho_de_teste = porcetagem_de_teste * len(Y)
 
-treino_dados = X[:tamanho_de_treino]
-treino_marcadores = Y[:tamanho_de_treino]
+treino_dados = X[0:tamanho_de_treino]
+treino_marcadores = Y[0:tamanho_de_treino]
 
-teste_dados = X[-tamanho_de_teste:]
-teste_marcadores = Y[-tamanho_de_teste:]
+fim_do_teste = tamanho_de_treino + tamanho_de_teste
+teste_dados = X[tamanho_de_treino:fim_do_teste]
+teste_marcadores = Y[tamanho_de_treino:fim_do_teste]
+
+validacao_dados = X[fim_do_teste:]
+validacao_marcadores = Y[fim_do_teste:]
+
+
+def taxa_de_acerto(marcadores_resultado, marcadores_esperados):
+	acertos = (marcadores_resultado == marcadores_esperados)
+	total_de_acertos = sum(acertos) #true e false somam como 0 e 1
+	total_de_elementos = len(marcadores_esperados)
+	taxa_de_acerto = 100.0 * total_de_acertos / total_de_elementos
+	return taxa_de_acerto
+
 
 def fit_and_predict(nome,modelo, treino_dados, treino_marcadores, teste_dados, teste_marcadores):
 	modelo.fit(treino_dados,treino_marcadores)
 
 	resultado = modelo.predict(teste_dados)
-	acertos = (resultado == teste_marcadores)
 
-	total_de_acertos = sum(acertos) #true e false somam como 0 e 1
-	total_de_elementos = len(teste_dados)
-	taxa_de_acerto = 100.0 * total_de_acertos / total_de_elementos
-	
-	msg = "Taxa de acerto do {0}: {1}".format(nome, taxa_de_acerto)	
+	msg = "Taxa de acerto do {0}: {1}".format(nome, taxa_de_acerto(resultado, teste_marcadores))
 	print(msg)
 	return taxa_de_acerto
 
@@ -50,7 +59,10 @@ if resultado_multinomial > resultado_adaboost:
 else:
 	vencedor = modelo_adaboost
 
+resultado = vencedor.predict(validacao_dados)
 
+msg = "Taxa de acerto do vencedor entre os dois algoritmos no mundo real: {0}".format(taxa_de_acerto(resultado, validacao_marcadores))
+print(msg)
 #eficacia do algoritimo via chute
 
 acerto_base = max(Counter(teste_marcadores).itervalues())
